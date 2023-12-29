@@ -1,0 +1,7 @@
+  conda create -n ml_env
+  conda activate
+  cd finishedProject/
+  pip install -r requirements.txt
+  pip install taipy
+  pip install --upgrade watchdog werkzeug flask
+  python classifier.py

@@ -17,6 +17,7 @@ class_names = {
 }
 
 model = models.load_model("baseline_mariya.keras")
+model.summary()
 
 def predict_image(model, path_to_img):
     img = Image.open(path_to_img)
