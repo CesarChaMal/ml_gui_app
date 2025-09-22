@@ -3,17 +3,11 @@
 echo "Starting ML GUI Image Classifier..."
 echo
 
-# Check if Python is installed
-if ! command -v python3 &> /dev/null; then
-    if ! command -v python &> /dev/null; then
-        echo "Error: Python is not installed or not in PATH"
-        echo "Please install Python 3.8+ and try again"
-        exit 1
-    else
-        PYTHON_CMD="python"
-    fi
-else
-    PYTHON_CMD="python3"
+# Check if conda is installed
+if ! command -v conda &> /dev/null; then
+    echo "Error: Conda is not installed or not in PATH"
+    echo "Please install Anaconda or Miniconda and try again"
+    exit 1
 fi
 
 # Check if we're in the correct directory
@@ -23,16 +17,25 @@ if [ ! -f "classifier.py" ]; then
     exit 1
 fi
 
-# Check if model file exists
-if [ ! -f "baseline_mariya.keras" ]; then
-    echo "Error: baseline_mariya.keras model file not found"
-    echo "Please ensure the model file is in the current directory"
-    exit 1
+# Create conda environment if it doesn't exist
+if ! conda info --envs | grep -q "ml_gui_env"; then
+    echo "Creating conda environment 'ml_gui_env'..."
+    conda create -n ml_gui_env python=3.9 -y
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create conda environment"
+        exit 1
+    fi
 fi
 
-# Install requirements
+# Activate conda environment
+echo "Activating conda environment..."
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate ml_gui_env
+
+# Install requirements using conda-forge when possible
 echo "Installing required packages..."
-$PYTHON_CMD -m pip install -r requirements.txt
+conda install -c conda-forge tensorflow flask pillow numpy -y
+pip install -r requirements.txt
 if [ $? -ne 0 ]; then
     echo "Error: Failed to install requirements"
     exit 1
@@ -44,4 +47,4 @@ echo "The GUI will open in your default web browser"
 echo "Press Ctrl+C to stop the application"
 echo
 
-$PYTHON_CMD classifier.py
+python classifier.py
